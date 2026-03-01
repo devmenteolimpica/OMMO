@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMMO 2025 — Prova</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- MathJax -->
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath:  [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        packages: {'[+]': ['ams']}
+      },
+      options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] },
+      startup: { typeset: false }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+
+  <style>
+    /* ══════════════════════════════════════
+       TOKENS
+    ══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja:     #FE6000;
+      --laranja-dim: rgba(254,96,0,.14);
+      --laranja-glow:rgba(254,96,0,.28);
+      --roxo:        #670BF5;
+      --roxo-dim:    rgba(103,11,245,.12);
+      --verde:       #00E06A;
+      --verde-dim:   rgba(0,224,106,.10);
+      --vermelho:    #FF3B3B;
+      --branco:      #FFFFFF;
+      --cinza-claro: #C8C8C8;
+      --cinza:       #686868;
+      --fundo:       #080808;
+      --fundo-card:  #0E0E0E;
+      --fundo-alt:   #131313;
+      --borda:       #1A1A1A;
+      --borda-mid:   #252525;
+      --borda-hover: #303030;
+      --fonte:       'Azeret Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--fonte);
+      background: var(--fundo);
+      color: var(--branco);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    /* grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: .020;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ══════════════════════════════════════
+       LOADING
+    ══════════════════════════════════════ */
+    #loading {
+      position: fixed; inset: 0;
+      background: var(--fundo);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      text-align: center;
+      padding: 32px;
+    }
+    #loading.hidden { display: none; }
+    .ld-icon    { font-size: 48px; margin-bottom: 4px; }
+    .ld-title   { font-size: 22px; font-weight: 900; }
+    .ld-sub     { font-size: 13px; font-weight: 700; color: var(--cinza); max-width: 360px; line-height: 1.7; }
+    .ld-bar     { width: 260px; height: 3px; background: var(--borda); border-radius: 99px; overflow: hidden; }
+    .ld-bar-fill{ height: 100%; background: var(--laranja); border-radius: 99px; animation: sweep 1.4s ease-in-out infinite; }
+    @keyframes sweep { 0%{width:0;margin-left:0} 50%{width:55%;margin-left:22%} 100%{width:0;margin-left:100%} }
+    .ld-picker  { display: none; flex-direction: column; align-items: center; gap: 12px; }
+    .btn-load {
+      font-family: var(--fonte);
+      font-size: 12px; font-weight: 900;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: var(--laranja); color: #fff;
+      border: none; padding: 12px 28px; border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 20px var(--laranja-glow);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .btn-load:hover { box-shadow: 0 0 36px var(--laranja-glow); transform: translateY(-1px); }
+
+    /* ══════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════ */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,8,.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--borda);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      height: 60px;
+    }
+    .hlogo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .hlogo-mark {
+      width: 32px; height: 32px;
+      background: var(--laranja); border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 900; color: #fff;
+      box-shadow: 0 0 12px var(--laranja-glow);
+    }
+    .hlogo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .hlogo-text .sup  { font-size: 9px; font-weight: 700; letter-spacing: 4px; color: var(--cinza); text-transform: uppercase; }
+    .hlogo-text .main { font-size: 14px; font-weight: 900; letter-spacing: 1px; }
+    .hlogo-text .main em { color: var(--laranja); font-style: normal; }
+
+    .timer-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--fundo-card);
+      border: 1px solid var(--borda-mid);
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+    .tdot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--verde); flex-shrink: 0;
+      animation: tdpulse 1.5s ease-in-out infinite;
+    }
+    @keyframes tdpulse { 50% { opacity: .3; transform: scale(.75); } }
+    #timer            { font-size: 14px; font-weight: 700; letter-spacing: 2px; color: var(--verde); }
+    #timer.warn       { color: var(--laranja); }
+    #timer.crit       { color: var(--vermelho); animation: blink .55s step-end infinite; }
+    @keyframes blink  { 50% { opacity: .15; } }
+
+    /* ══════════════════════════════════════
+       NAV STRIP — barra horizontal de questões
+    ══════════════════════════════════════ */
+    #nav-strip-wrap {
+      position: sticky; top: 60px; z-index: 90;
+      background: rgba(8,8,8,.96);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--borda);
+      display: none;  /* shown after load */
+    }
+    #nav-strip-wrap.show { display: block; }
+
+    .nav-strip-inner {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 20px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+    .nav-strip-inner::-webkit-scrollbar { height: 2px; }
+    .nav-strip-inner::-webkit-scrollbar-track { background: transparent; }
+    .nav-strip-inner::-webkit-scrollbar-thumb { background: var(--borda-hover); border-radius: 2px; }
+
+    .qbtn {
+      width: 28px; height: 28px;
+      flex-shrink: 0;
+      border-radius: 6px;
+      border: 1px solid var(--borda-mid);
+      background: var(--fundo-card);
+      font-family: var(--fonte);
+      font-size: 10px; font-weight: 700;
+      color: var(--cinza);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .13s;
+    }
+    .qbtn:hover { border-color: var(--borda-hover); color: var(--cinza-claro); }
+    .qbtn.atual { border-color: var(--laranja); color: var(--laranja); background: var(--laranja-dim); }
+    .qbtn.feita { border-color: var(--verde);  color: var(--verde);  background: var(--verde-dim); }
+    .qbtn.atual.feita { border-color: var(--laranja); color: var(--laranja); background: var(--laranja-dim); }
+
+    .strip-sep { width: 1px; height: 20px; background: var(--borda-mid); flex-shrink: 0; margin: 0 4px; }
+
+    .strip-count {
+      font-size: 10px; font-weight: 700;
+      color: var(--cinza);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .strip-count strong { color: var(--laranja); }
+
+    /* ══════════════════════════════════════
+       APP WRAPPER
+    ══════════════════════════════════════ */
+    #app { display: none; }
+    #app.show { display: block; }
+
+    /* ══════════════════════════════════════
+       QUESTÃO
+    ══════════════════════════════════════ */
+    .main-area {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 44px 28px 80px;
+    }
+
+    .q-block { display: none; animation: fadeup .22s ease; }
+    .q-block.show { display: block; }
+    @keyframes fadeup { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+
+    /* cabeçalho só com número */
+    .q-header { margin-bottom: 26px; }
+    .q-num {
+      display: flex; align-items: baseline; gap: 8px;
+    }
+    .q-num .lbl {
+      font-size: 9px; font-weight: 900;
+      letter-spacing: 4px; color: var(--cinza);
+      text-transform: uppercase;
+    }
+    .q-num .val { font-size: 28px; font-weight: 900; line-height: 1; }
+
+    /* enunciado */
+    .enunciado {
+      font-size: 15px; font-weight: 700;
+      line-height: 1.85;
+      color: var(--cinza-claro);
+      margin-bottom: 8px;
+    }
+    .enunciado strong { color: var(--branco); }
+
+    /* bloco de math */
+    .math-box {
+      background: var(--fundo-card);
+      border: 1px solid var(--borda-mid);
+      border-left: 3px solid var(--roxo);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 22px;
+      margin: 18px 0;
+      font-size: 16px; font-weight: 700;
+      color: var(--branco);
+      text-align: center;
+      overflow-x: auto;
+    }
+
+    /* ══════════════════════════════════════
+       ALTERNATIVAS (múltipla escolha)
+    ══════════════════════════════════════ */
+    .alts { display: flex; flex-direction: column; gap: 8px; margin-top: 22px; }
+
+    .alt {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 18px;
+      border: 1px solid var(--borda-mid);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all .14s;
+      background: var(--fundo-card);
+      user-select: none;
+    }
+    .alt:hover { border-color: var(--borda-hover); background: var(--fundo-alt); }
+    .alt input[type=radio] { display: none; }
+
+    .alt-letra {
+      width: 30px; height: 30px;
+      border-radius: 7px;
+      border: 2px solid var(--borda-hover);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 900;
+      color: var(--cinza);
+      flex-shrink: 0;
+      transition: all .14s;
+    }
+    .alt-text {
+      font-size: 14px; font-weight: 700;
+      color: var(--cinza-claro);
+      line-height: 1.6;
+      flex: 1;
+      overflow-x: auto;
+    }
+
+    .alt:has(input:checked) {
+      border-color: var(--laranja);
+      background: rgba(254,96,0,.05);
+      box-shadow: 0 0 0 1px rgba(254,96,0,.15);
+    }
+    .alt:has(input:checked) .alt-letra {
+      background: var(--laranja); border-color: var(--laranja);
+      color: #fff; box-shadow: 0 0 10px var(--laranja-glow);
+    }
+    .alt:has(input:checked) .alt-text { color: var(--branco); }
+
+    /* ══════════════════════════════════════
+       ITENS DE JUSTIFICATIVA
+    ══════════════════════════════════════ */
+    .just-itens { display: flex; flex-direction: column; gap: 18px; margin-top: 22px; }
+
+    .just-item {
+      border: 1px solid var(--borda-mid);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* cabeçalho do item */
+    .just-item-head {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 18px;
+      background: var(--fundo-card);
+      border-bottom: 1px solid var(--borda);
+    }
+    .just-letra-badge {
+      width: 30px; height: 30px;
+      border-radius: 7px;
+      border: 2px solid var(--borda-hover);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 900;
+      color: var(--cinza-claro);
+      flex-shrink: 0;
+      transition: border-color .2s, color .2s;
+    }
+    .just-item.tem-foto .just-letra-badge {
+      border-color: var(--verde);
+      color: var(--verde);
+    }
+    .just-item-texto {
+      font-size: 14px; font-weight: 700;
+      color: var(--cinza-claro);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    /* zona de fotos */
+    .just-fotos-area {
+      padding: 14px 18px;
+      background: var(--fundo);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .fotos-hint {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; color: var(--cinza);
+      text-transform: uppercase;
+    }
+
+    .fotos-grid { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; }
+
+    /* slot de foto individual */
+    .foto-slot {
+      width: 100px; height: 100px;
+      border-radius: 8px;
+      border: 1px dashed var(--borda-hover);
+      background: var(--fundo-card);
+      position: relative;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .foto-slot:hover { border-color: var(--laranja); background: var(--laranja-dim); }
+    .foto-slot.ocupado { border-style: solid; border-color: var(--borda-mid); cursor: default; }
+    .foto-slot.ocupado:hover { border-color: var(--borda-mid); background: var(--fundo-card); }
+
+    .foto-slot input[type=file] {
+      position: absolute; inset: 0;
+      opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+    .foto-slot.ocupado input[type=file] { display: none; }
+
+    .foto-slot-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px;
+      pointer-events: none;
+    }
+    .foto-slot-ico { font-size: 22px; }
+    .foto-slot-txt { font-size: 9px; font-weight: 700; color: var(--cinza); letter-spacing: 1px; }
+
+    .foto-slot img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 7px;
+      display: none;
+    }
+    .foto-slot.ocupado img { display: block; }
+
+    .foto-slot-rm {
+      position: absolute; top: 4px; right: 4px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: rgba(255,59,59,.9);
+      color: #fff;
+      font-size: 10px; font-weight: 900;
+      border: none; cursor: pointer;
+      display: none;
+      align-items: center; justify-content: center;
+      z-index: 2;
+      transition: background .15s;
+    }
+    .foto-slot.ocupado .foto-slot-rm { display: flex; }
+    .foto-slot-rm:hover { background: var(--vermelho); }
+
+    /* botão adicionar mais (slot 4 virtual, não aparece) */
+    .fotos-max-aviso {
+      font-size: 11px; font-weight: 700;
+      color: var(--cinza);
+      display: none;
+    }
+    .fotos-max-aviso.show { display: block; }
+
+    /* ══════════════════════════════════════
+       NAVEGAÇÃO INFERIOR
+    ══════════════════════════════════════ */
+    .nav-bottom {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-top: 44px;
+      padding-top: 24px;
+      border-top: 1px solid var(--borda);
+      gap: 10px;
+    }
+
+    .btn {
+      font-family: var(--fonte);
+      font-size: 12px; font-weight: 900;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 11px 24px; border-radius: 8px;
+      border: none; cursor: pointer;
+      transition: all .15s;
+      display: inline-flex; align-items: center; gap: 7px;
+      text-decoration: none;
+    }
+    .btn-ghost {
+      background: var(--fundo-card);
+      border: 1px solid var(--borda-mid);
+      color: var(--cinza);
+    }
+    .btn-ghost:hover { border-color: var(--borda-hover); color: var(--cinza-claro); background: var(--fundo-alt); }
+
+    .btn-primary {
+      background: var(--laranja); color: #fff;
+      box-shadow: 0 0 16px var(--laranja-glow);
+    }
+    .btn-primary:hover { box-shadow: 0 0 28px var(--laranja-glow); transform: translateY(-1px); }
+
+    .btn-finalizar {
+      background: linear-gradient(135deg, var(--verde), #00c060);
+      color: #000; font-weight: 900;
+      box-shadow: 0 0 14px rgba(0,224,106,.2);
+      display: none;
+    }
+    .btn-finalizar:hover { box-shadow: 0 0 28px rgba(0,224,106,.4); transform: translateY(-1px); }
+    .btn-finalizar.show { display: inline-flex; }
+
+    /* ══════════════════════════════════════
+       MODAL ALERTA — QUESTÕES EM BRANCO
+    ══════════════════════════════════════ */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.86);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .overlay.open { display: flex; }
+
+    .modal {
+      background: #0b0b0b;
+      border: 1px solid var(--borda-hover);
+      border-radius: 16px;
+      padding: 36px 32px;
+      max-width: 480px; width: 100%;
+      max-height: 80vh; overflow-y: auto;
+      animation: fadeup .22s ease;
+    }
+    .modal::-webkit-scrollbar { width: 3px; }
+    .modal::-webkit-scrollbar-thumb { background: var(--borda-hover); border-radius: 3px; }
+
+    .modal-ico   { font-size: 36px; margin-bottom: 14px; }
+    .modal-title { font-size: 18px; font-weight: 900; margin-bottom: 6px; }
+    .modal-sub   { font-size: 13px; font-weight: 700; color: var(--cinza); line-height: 1.65; margin-bottom: 24px; }
+
+    /* lista de em branco */
+    .blanks-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 28px; }
+    .blank-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--fundo-card);
+      border: 1px solid var(--borda-mid);
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all .13s;
+    }
+    .blank-item:hover { border-color: var(--borda-hover); background: var(--fundo-alt); }
+    .blank-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cinza); flex-shrink: 0; }
+    .blank-qnum { font-size: 10px; font-weight: 900; color: var(--cinza); letter-spacing: 2px; min-width: 38px; }
+    .blank-tipo { font-size: 12px; font-weight: 700; color: var(--cinza-claro); flex: 1; }
+    .blank-arrow { font-size: 11px; color: var(--cinza); }
+
+    /* modal confirm envio */
+    .modal-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-modal-voltar {
+      font-family: var(--fonte); font-size: 12px; font-weight: 900;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: var(--fundo-card); border: 1px solid var(--borda-mid);
+      color: var(--cinza); padding: 11px 20px; border-radius: 8px;
+      cursor: pointer; flex: 1; transition: all .15s;
+    }
+    .btn-modal-voltar:hover { border-color: var(--borda-hover); color: var(--cinza-claro); }
+
+    .btn-modal-enviar {
+      font-family: var(--fonte); font-size: 12px; font-weight: 900;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: linear-gradient(135deg, var(--verde), #00c060);
+      color: #000; border: none;
+      padding: 11px 20px; border-radius: 8px;
+      cursor: pointer; flex: 1;
+      box-shadow: 0 0 14px rgba(0,224,106,.2);
+      transition: all .15s;
+    }
+    .btn-modal-enviar:hover { box-shadow: 0 0 28px rgba(0,224,106,.4); transform: translateY(-1px); }
+
+    @media (max-width: 600px) {
+      header { padding: 0 18px; }
+      .main-area { padding: 28px 16px 70px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOADING ══ -->
+<div id="loading">
+  <div class="ld-icon">🏆</div>
+  <p class="ld-title">OMMO 2025</p>
+  <p class="ld-sub" id="ld-msg">Carregando questões...</p>
+  <div class="ld-bar" id="ld-bar"><div class="ld-bar-fill"></div></div>
+  <div class="ld-picker" id="ld-picker">
+    <p style="font-size:12px;font-weight:700;color:var(--cinza);max-width:320px;line-height:1.65;text-align:center;">
+      Selecione o arquivo <strong style="color:var(--branco)">questoes.json</strong> para iniciar.
+    </p>
+    <button class="btn-load" onclick="document.getElementById('json-input').click()">📂 CARREGAR QUESTÕES</button>
+    <input type="file" id="json-input" accept=".json" style="display:none" onchange="carregarArquivo(event)">
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <a class="hlogo" href="#">
+    <div class="hlogo-mark">M</div>
+    <div class="hlogo-text">
+      <span class="sup">Mente Olímpica</span>
+      <span class="main">OMMO <em>2025</em></span>
+    </div>
+  </a>
+  <div class="timer-pill">
+    <div class="tdot" id="tdot"></div>
+    <span id="timer">--:--:--</span>
+  </div>
+</header>
+
+<!-- ══ NAV STRIP ══ -->
+<div id="nav-strip-wrap">
+  <div class="nav-strip-inner" id="nav-strip">
+    <!-- preenchido via JS -->
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="main-area">
+    <div id="q-container"></div>
+    <div class="nav-bottom">
+      <button class="btn btn-ghost" id="btn-ant"  onclick="navQ(-1)">← ANTERIOR</button>
+      <button class="btn btn-primary" id="btn-prox" onclick="navQ(1)">PRÓXIMA →</button>
+      <button class="btn btn-finalizar" id="btn-fin" onclick="tentarEnviar()">ENVIAR PROVA ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ALERTA BRANCOS ══ -->
+<div class="overlay" id="modal-brancos">
+  <div class="modal">
+    <div class="modal-ico">⚠️</div>
+    <h2 class="modal-title">QUESTÕES SEM RESPOSTA</h2>
+    <p class="modal-sub" id="modal-sub-txt"></p>
+    <div class="blanks-list" id="blanks-list"></div>
+    <div class="modal-btns">
+      <button class="btn-modal-voltar" onclick="fecharModal('modal-brancos')">VOLTAR E RESPONDER</button>
+      <button class="btn-modal-enviar" onclick="confirmarEnvio()">ENVIAR MESMO ASSIM</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CONFIRMAR ENVIO (nenhum branco) ══ -->
+<div class="overlay" id="modal-confirmar">
+  <div class="modal">
+    <div class="modal-ico">✅</div>
+    <h2 class="modal-title">ENVIAR PROVA?</h2>
+    <p class="modal-sub">Todas as questões foram respondidas. Esta ação é <strong style="color:var(--branco)">irreversível</strong>. Confirme para enviar.</p>
+    <div class="modal-btns">
+      <button class="btn-modal-voltar" onclick="fecharModal('modal-confirmar')">CANCELAR</button>
+      <button class="btn-modal-enviar" onclick="confirmarEnvio()">ENVIAR PROVA →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   ESTADO GLOBAL
+═══════════════════════════════════════════ */
+let CONFIG    = null;
+let qAtual    = 0;
+let timerSec  = 0;
+let timerInt  = null;
+let startTs   = null;
+
+// multipla:     ANSWERS[i] = 'A' | 'B' | ...
+// justificativa: ANSWERS[i] = true  (se tiver ≥1 foto em qualquer item)
+const ANSWERS = {};
+
+// Fotos: FOTOS[qIdx][itemLetra][slotIdx] = { nome, base64, size }
+const FOTOS   = {};
+
+// controle de typeset MathJax
+const typeset_done = new Set();
+
+/* ═══════════════════════════════════════════
+   CARREGAR JSON
+═══════════════════════════════════════════ */
+async function init() {
+  try {
+    const r = await fetch('questoes.json');
+    if (!r.ok) throw new Error('não encontrado');
+    iniciarProva(await r.json());
+  } catch {
+    document.getElementById('ld-bar').style.display    = 'none';
+    document.getElementById('ld-msg').textContent      = 'Arquivo questoes.json não encontrado.';
+    document.getElementById('ld-picker').style.display = 'flex';
+  }
+}
+
+function carregarArquivo(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try   { iniciarProva(JSON.parse(ev.target.result)); }
+    catch { document.getElementById('ld-msg').textContent = '❌ JSON inválido.'; }
+  };
+  reader.readAsText(file);
+}
+
+/* ═══════════════════════════════════════════
+   INICIAR PROVA
+═══════════════════════════════════════════ */
+function iniciarProva(data) {
+  CONFIG  = data;
+  timerSec = data.meta.duracao;
+  startTs  = Date.now();
+
+  localStorage.setItem('ommo_meta',  JSON.stringify(data.meta));
+  localStorage.setItem('ommo_start', startTs);
+
+  renderNav();
+  renderQuestoes();
+
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('nav-strip-wrap').classList.add('show');
+  document.getElementById('app').classList.add('show');
+
+  iniciarTimer();
+  irParaQ(0);
+}
+
+/* ═══════════════════════════════════════════
+   NAV STRIP
+═══════════════════════════════════════════ */
+function renderNav() {
+  const strip = document.getElementById('nav-strip');
+  strip.innerHTML = '';
+
+  CONFIG.questoes.forEach((q, i) => {
+    const btn = document.createElement('button');
+    btn.className   = 'qbtn';
+    btn.id          = `nb-${i}`;
+    btn.textContent = q.id;
+    btn.title       = `Questão ${q.id}`;
+    btn.onclick     = () => irParaQ(i);
+    strip.appendChild(btn);
+  });
+
+  strip.appendChild(Object.assign(document.createElement('div'), { className: 'strip-sep' }));
+
+  const count = document.createElement('span');
+  count.className = 'strip-count';
+  count.id        = 'strip-count';
+  count.innerHTML = '<strong>0</strong>/' + CONFIG.questoes.length;
+  strip.appendChild(count);
+}
+
+/* ═══════════════════════════════════════════
+   RENDERIZAR QUESTÕES
+═══════════════════════════════════════════ */
+function renderQuestoes() {
+  const cont = document.getElementById('q-container');
+  cont.innerHTML = '';
+
+  CONFIG.questoes.forEach((q, i) => {
+    FOTOS[i] = {};
+
+    const div = document.createElement('div');
+    div.className = 'q-block';
+    div.id        = `q-${i}`;
+    div.innerHTML = buildQuestaoHTML(q, i);
+    cont.appendChild(div);
+  });
+}
+
+function buildQuestaoHTML(q, i) {
+  const mathHTML = q.math
+    ? `<div class="math-box">${q.math}</div>`
+    : '';
+
+  let inputHTML = '';
+
+  if (q.tipo === 'multipla') {
+    inputHTML = `<div class="alts">
+      ${q.alternativas.map(a => `
+        <label class="alt" onclick="marcarResposta(${i}, '${a.letra}')">
+          <input type="radio" name="q${i}" value="${a.letra}">
+          <div class="alt-letra">${a.letra}</div>
+          <div class="alt-text">${a.texto}</div>
+        </label>
+      `).join('')}
+    </div>`;
+
+  } else if (q.tipo === 'justificativa') {
+    const itens = q.itens && q.itens.length
+      ? q.itens
+      : [{ letra:'a', texto:'Resolva e fotografe sua resolução.' },
+         { letra:'b', texto:'Detalhe cada passo da justificativa.' },
+         { letra:'c', texto:'Apresente a conclusão final.' }];
+
+    const itensHTML = itens.map((item, j) => `
+      <div class="just-item" id="jitem-${i}-${item.letra}">
+        <div class="just-item-head">
+          <div class="just-letra-badge">${item.letra}</div>
+          <div class="just-item-texto">${item.texto}</div>
+        </div>
+        <div class="just-fotos-area">
+          <span class="fotos-hint">📎 Envie até 3 fotos (máx. 4 MB cada)</span>
+          <div class="fotos-grid" id="fgrid-${i}-${item.letra}">
+            ${[0,1,2].map(s => buildFotoSlot(i, item.letra, s)).join('')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    inputHTML = `<div class="just-itens">${itensHTML}</div>`;
+  }
+
+  return `
+    <div class="q-header">
+      <div class="q-num">
+        <span class="lbl">QUESTÃO</span>
+        <span class="val">${String(q.id).padStart(2,'0')}</span>
+      </div>
+    </div>
+    <div class="enunciado">${q.enunciado}</div>
+    ${mathHTML}
+    ${inputHTML}
+  `;
+}
+
+function buildFotoSlot(qIdx, letra, slotIdx) {
+  return `
+    <div class="foto-slot" id="fslot-${qIdx}-${letra}-${slotIdx}">
+      <input type="file" accept="image/*"
+        onchange="handleFoto(event, ${qIdx}, '${letra}', ${slotIdx})">
+      <div class="foto-slot-placeholder">
+        <span class="foto-slot-ico">+</span>
+        <span class="foto-slot-txt">FOTO ${slotIdx+1}</span>
+      </div>
+      <img id="fimg-${qIdx}-${letra}-${slotIdx}" src="" alt="">
+      <button class="foto-slot-rm"
+        onclick="removerFoto(event, ${qIdx}, '${letra}', ${slotIdx})">✕</button>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════
+   NAVEGAÇÃO
+═══════════════════════════════════════════ */
+function irParaQ(idx) {
+  document.getElementById(`q-${qAtual}`)?.classList.remove('show');
+  document.getElementById(`nb-${qAtual}`)?.classList.remove('atual');
+
+  qAtual = idx;
+
+  document.getElementById(`q-${qAtual}`)?.classList.add('show');
+
+  const nb = document.getElementById(`nb-${qAtual}`);
+  nb?.classList.add('atual');
+  nb?.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+
+  const isLast = qAtual === CONFIG.questoes.length - 1;
+  document.getElementById('btn-ant').style.display  = qAtual === 0 ? 'none' : '';
+  document.getElementById('btn-prox').style.display = isLast ? 'none' : '';
+  const btnFin = document.getElementById('btn-fin');
+  if (isLast) btnFin.classList.add('show'); else btnFin.classList.remove('show');
+
+  // Typeset MathJax (uma vez por questão)
+  typesetQ(qAtual);
+}
+
+function navQ(dir) {
+  const next = qAtual + dir;
+  if (next >= 0 && next < CONFIG.questoes.length) irParaQ(next);
+}
+
+/* ═══════════════════════════════════════════
+   MATHJAX TYPESET
+═══════════════════════════════════════════ */
+async function typesetQ(idx) {
+  if (typeset_done.has(idx)) return;
+  const el = document.getElementById(`q-${idx}`);
+  if (!el || !window.MathJax || !MathJax.typesetPromise) return;
+  try {
+    await MathJax.typesetPromise([el]);
+    typeset_done.add(idx);
+  } catch {}
+}
+
+/* ═══════════════════════════════════════════
+   RESPOSTA MÚLTIPLA ESCOLHA
+═══════════════════════════════════════════ */
+function marcarResposta(qIdx, letra) {
+  ANSWERS[qIdx] = letra;
+  document.getElementById(`nb-${qIdx}`)?.classList.add('feita');
+  atualizarContador();
+  persistir();
+}
+
+/* ═══════════════════════════════════════════
+   FOTOS — UPLOAD
+═══════════════════════════════════════════ */
+const MAX_FOTO_BYTES = 4 * 1024 * 1024; // 4 MB
+
+function handleFoto(e, qIdx, letra, slotIdx) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (file.size > MAX_FOTO_BYTES) {
+    mostrarErro(`A foto excede 4 MB (${(file.size/1024/1024).toFixed(1)} MB). Escolha outra.`);
+    e.target.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img_el = new Image();
+    img_el.onload = () => {
+      // Comprimir se necessário
+      const MAX_DIM = 1600;
+      let w = img_el.width, h = img_el.height;
+      if (w > MAX_DIM || h > MAX_DIM) {
+        if (w > h) { h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
+        else        { w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img_el, 0, 0, w, h);
+      const b64 = canvas.toDataURL('image/jpeg', 0.82);
+
+      // Guardar
+      if (!FOTOS[qIdx][letra]) FOTOS[qIdx][letra] = {};
+      FOTOS[qIdx][letra][slotIdx] = { nome: file.name, base64: b64, w, h };
+
+      // Preview
+      const slot = document.getElementById(`fslot-${qIdx}-${letra}-${slotIdx}`);
+      const imgEl = document.getElementById(`fimg-${qIdx}-${letra}-${slotIdx}`);
+      imgEl.src = b64;
+      slot.classList.add('ocupado');
+
+      // Marcar item como respondido
+      verificarJust(qIdx);
+    };
+    img_el.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function removerFoto(e, qIdx, letra, slotIdx) {
+  e.stopPropagation();
+
+  const slot  = document.getElementById(`fslot-${qIdx}-${letra}-${slotIdx}`);
+  const imgEl = document.getElementById(`fimg-${qIdx}-${letra}-${slotIdx}`);
+
+  imgEl.src = '';
+  slot.classList.remove('ocupado');
+
+  // limpa input file (permite re-upload do mesmo arquivo)
+  const inp = slot.querySelector('input[type=file]');
+  if (inp) inp.value = '';
+
+  if (FOTOS[qIdx][letra]) delete FOTOS[qIdx][letra][slotIdx];
+  verificarJust(qIdx);
+}
+
+/* Se tiver ≥1 foto em qualquer item → questão respondida */
+function verificarJust(qIdx) {
+  const temFoto = Object.values(FOTOS[qIdx]).some(slots =>
+    Object.keys(slots).length > 0
+  );
+  if (temFoto) {
+    ANSWERS[qIdx] = '__just__';
+    document.getElementById(`nb-${qIdx}`)?.classList.add('feita');
+    // Atualiza badge de letras
+    const q = CONFIG.questoes[qIdx];
+    if (q.itens) {
+      q.itens.forEach(item => {
+        const temFotoItem = FOTOS[qIdx][item.letra] && Object.keys(FOTOS[qIdx][item.letra]).length > 0;
+        const jitem = document.getElementById(`jitem-${qIdx}-${item.letra}`);
+        if (jitem) {
+          if (temFotoItem) jitem.classList.add('tem-foto');
+          else jitem.classList.remove('tem-foto');
+        }
+      });
+    }
+  } else {
+    delete ANSWERS[qIdx];
+    document.getElementById(`nb-${qIdx}`)?.classList.remove('feita');
+    const q = CONFIG.questoes[qIdx];
+    if (q.itens) {
+      q.itens.forEach(item => {
+        document.getElementById(`jitem-${qIdx}-${item.letra}`)?.classList.remove('tem-foto');
+      });
+    }
+  }
+  atualizarContador();
+  persistir();
+}
+
+/* ═══════════════════════════════════════════
+   CONTADOR NO STRIP
+═══════════════════════════════════════════ */
+function atualizarContador() {
+  const feitas = Object.keys(ANSWERS).filter(k => ANSWERS[k] != null).length;
+  const el = document.getElementById('strip-count');
+  if (el) el.innerHTML = `<strong>${feitas}</strong>/${CONFIG.questoes.length}`;
+}
+
+/* ═══════════════════════════════════════════
+   PERSISTIR NO LOCALSTORAGE
+═══════════════════════════════════════════ */
+function persistir() {
+  localStorage.setItem('ommo_answers', JSON.stringify(ANSWERS));
+  CONFIG.questoes.forEach((q, i) => {
+    if (q.tipo !== 'justificativa') return;
+    try {
+      const data = FOTOS[i] && Object.keys(FOTOS[i]).length ? FOTOS[i] : null;
+      if (data) localStorage.setItem(`ommo_fotos_${i}`, JSON.stringify(data));
+      else localStorage.removeItem(`ommo_fotos_${i}`);
+    } catch {}
+  });
+}
+
+/* ═══════════════════════════════════════════
+   TIMER
+═══════════════════════════════════════════ */
+function iniciarTimer() {
+  function fmt(s) {
+    return [Math.floor(s/3600), Math.floor((s%3600)/60), s%60]
+      .map(v => String(v).padStart(2,'0')).join(':');
+  }
+  timerInt = setInterval(() => {
+    timerSec--;
+    const el  = document.getElementById('timer');
+    const dot = document.getElementById('tdot');
+    el.textContent = fmt(timerSec);
+    if (timerSec <= 600 && timerSec > 300) {
+      el.className = 'warn';
+      dot.style.background = 'var(--laranja)';
+    } else if (timerSec <= 300) {
+      el.className = 'crit';
+      dot.style.background = 'var(--vermelho)';
+    }
+    if (timerSec <= 0) {
+      clearInterval(timerInt);
+      confirmarEnvio();
+    }
+  }, 1000);
+}
+
+/* ═══════════════════════════════════════════
+   TENTAR ENVIAR — checar brancos
+═══════════════════════════════════════════ */
+function tentarEnviar() {
+  const brancos = CONFIG.questoes.reduce((acc, q, i) => {
+    if (ANSWERS[i] == null) acc.push({ q, i });
+    return acc;
+  }, []);
+
+  if (brancos.length === 0) {
+    // Tudo respondido → confirmar envio
+    abrirModal('modal-confirmar');
+    return;
+  }
+
+  // Há brancos → mostrar alerta
+  const plural = brancos.length > 1;
+  document.getElementById('modal-sub-txt').innerHTML =
+    `<strong style="color:var(--branco)">${brancos.length} questão${plural?'es':''}</strong> ${plural?'estão':'está'} sem resposta. Você pode voltar e responder ou enviar a prova mesmo assim.`;
+
+  const list = document.getElementById('blanks-list');
+  list.innerHTML = '';
+  brancos.forEach(({ q, i }) => {
+    const item = document.createElement('div');
+    item.className = 'blank-item';
+    item.onclick = () => { fecharModal('modal-brancos'); irParaQ(i); };
+    item.innerHTML = `
+      <div class="blank-dot"></div>
+      <span class="blank-qnum">Q${String(q.id).padStart(2,'0')}</span>
+      <span class="blank-tipo">${q.tipo === 'multipla' ? 'Múltipla Escolha' : 'Justificativa'}</span>
+      <span class="blank-arrow">↗</span>
+    `;
+    list.appendChild(item);
+  });
+
+  abrirModal('modal-brancos');
+}
+
+function abrirModal(id)  { document.getElementById(id).classList.add('open'); }
+function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* ═══════════════════════════════════════════
+   ENVIAR
+═══════════════════════════════════════════ */
+function confirmarEnvio() {
+  clearInterval(timerInt);
+  fecharModal('modal-brancos');
+  fecharModal('modal-confirmar');
+
+  const tempoUsado = Math.round((Date.now() - startTs) / 1000);
+  localStorage.setItem('ommo_tempo_usado', tempoUsado);
+  localStorage.setItem('ommo_answers', JSON.stringify(ANSWERS));
+  localStorage.setItem('ommo_q_count', CONFIG.questoes.length);
+
+  // info sem gabarito
+  const info = CONFIG.questoes.map(q => ({
+    id: q.id, tipo: q.tipo,
+    area: q.area, dificuldade: q.dificuldade, pontos: q.pontos,
+    itens: q.itens ? q.itens.map(it => it.letra) : null
+  }));
+  localStorage.setItem('ommo_questoes_info', JSON.stringify(info));
+
+  window.location.href = 'resultado.html';
+}
+
+/* ═══════════════════════════════════════════
+   MENSAGEM DE ERRO INLINE (substitui toast)
+═══════════════════════════════════════════ */
+function mostrarErro(msg) {
+  let el = document.getElementById('inline-erro');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'inline-erro';
+    el.style.cssText = `
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+      background:#1a0a0a; border:1px solid var(--vermelho);
+      color:var(--vermelho); font-family:var(--fonte); font-size:12px;
+      font-weight:700; padding:12px 20px; border-radius:10px;
+      box-shadow:0 8px 30px rgba(0,0,0,.6); z-index:400;
+      opacity:0; transition:opacity .25s;
+      white-space:nowrap;
+    `;
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 3500);
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

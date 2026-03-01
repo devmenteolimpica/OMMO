@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMMO 2025 — Resultado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja: #FE6000; --laranja-glow: rgba(254,96,0,.3); --laranja-dim: rgba(254,96,0,.1);
+      --roxo: #670BF5; --roxo-dim: rgba(103,11,245,.1);
+      --verde: #00E06A; --verde-dim: rgba(0,224,106,.08);
+      --vermelho: #FF3B3B;
+      --branco: #FFFFFF; --cinza-claro: #C8C8C8; --cinza: #6A6A6A;
+      --fundo: #080808; --fundo-card: #0F0F0F; --fundo-alt: #141414;
+      --borda: #1C1C1C; --borda-hover: #2E2E2E;
+      --fonte: 'Azeret Mono', monospace;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:var(--fonte); background:var(--fundo); color:var(--branco); min-height:100vh; }
+    body::after { content:''; position:fixed; inset:0; background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity:.022; pointer-events:none; z-index:9999; }
+
+    /* HEADER */
+    header { position:sticky; top:0; z-index:100; background:rgba(8,8,8,.94); backdrop-filter:blur(18px); border-bottom:1px solid var(--borda); display:flex; align-items:center; justify-content:space-between; padding:0 36px; height:62px; }
+    .hlogo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .hlogo-mark { width:34px; height:34px; background:var(--laranja); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; color:#fff; box-shadow:0 0 14px var(--laranja-glow); }
+    .hlogo-text { display:flex; flex-direction:column; line-height:1.1; }
+    .hlogo-text .sup { font-size:9px; font-weight:700; letter-spacing:4px; color:var(--cinza); text-transform:uppercase; }
+    .hlogo-text .main { font-size:14px; font-weight:900; letter-spacing:1px; }
+    .hlogo-text .main em { color:var(--laranja); font-style:normal; }
+    .badge { font-size:9px; font-weight:900; letter-spacing:3px; color:var(--verde); border:1px solid rgba(0,224,106,.3); background:rgba(0,224,106,.07); padding:4px 12px; border-radius:20px; text-transform:uppercase; }
+
+    /* PAGE */
+    .page { max-width:760px; margin:0 auto; padding:52px 32px 80px; }
+
+    /* HERO */
+    .hero { text-align:center; margin-bottom:52px; }
+    .hero-icon { font-size:56px; margin-bottom:20px; display:block; }
+    .hero-title { font-size:clamp(22px,4vw,32px); font-weight:900; margin-bottom:8px; }
+    .hero-title em { color:var(--verde); font-style:normal; }
+    .hero-sub { font-size:14px; font-weight:700; color:var(--cinza); line-height:1.7; max-width:480px; margin:0 auto; }
+
+    /* STATS */
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:48px; }
+    .stat { background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px; padding:22px 20px; text-align:center; }
+    .stat-n { font-size:30px; font-weight:900; color:var(--laranja); margin-bottom:4px; }
+    .stat-d { font-size:10px; font-weight:900; letter-spacing:3px; color:var(--cinza); text-transform:uppercase; }
+
+    /* SECTION */
+    .sec-title { font-size:10px; font-weight:900; letter-spacing:4px; color:var(--cinza); text-transform:uppercase; margin-bottom:18px; }
+
+    /* RESPOSTAS LIST */
+    .resp-list { display:flex; flex-direction:column; gap:10px; margin-bottom:48px; }
+    .resp-card { background:var(--fundo-card); border:1px solid var(--borda); border-radius:12px; overflow:hidden; }
+    .resp-card-head { display:flex; align-items:center; gap:14px; padding:16px 20px; }
+    .resp-status { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .resp-status.ok { background:var(--verde); box-shadow:0 0 6px rgba(0,224,106,.4); }
+    .resp-status.vazia { background:var(--cinza); }
+    .resp-qnum { font-size:10px; font-weight:900; letter-spacing:2px; color:var(--cinza); min-width:44px; }
+    .resp-info { flex:1; }
+    .resp-area { font-size:12px; font-weight:900; color:var(--cinza-claro); }
+    .resp-tipo-badge { font-size:9px; font-weight:900; letter-spacing:2px; padding:3px 8px; border-radius:4px; border:1px solid; text-transform:uppercase; }
+    .resp-tipo-badge.multipla { color:var(--roxo); border-color:rgba(103,11,245,.4); background:var(--roxo-dim); }
+    .resp-tipo-badge.justificativa { color:var(--laranja); border-color:rgba(254,96,0,.4); background:var(--laranja-dim); }
+    .resp-valor { font-size:13px; font-weight:900; text-align:right; }
+    .resp-valor.ok { color:var(--verde); }
+    .resp-valor.vazia { color:var(--cinza); font-size:11px; }
+    .resp-pts { font-size:10px; font-weight:700; color:var(--cinza); }
+
+    /* PREVIEW IMAGEM */
+    .resp-img-preview { border-top:1px solid var(--borda); padding:16px 20px; }
+    .resp-img-preview img { max-width:100%; max-height:200px; border-radius:8px; border:1px solid var(--borda-hover); }
+    .resp-img-nome { font-size:11px; font-weight:700; color:var(--cinza); margin-top:8px; }
+
+    /* ZIP SECTION */
+    .zip-box { background:var(--fundo-card); border:1px solid var(--borda-hover); border-radius:16px; padding:32px; text-align:center; margin-bottom:48px; }
+    .zip-icon { font-size:42px; margin-bottom:16px; display:block; }
+    .zip-title { font-size:18px; font-weight:900; margin-bottom:8px; }
+    .zip-sub { font-size:13px; font-weight:700; color:var(--cinza); line-height:1.7; max-width:440px; margin:0 auto 24px; }
+    .zip-contents { display:flex; flex-direction:column; gap:7px; text-align:left; background:var(--fundo); border:1px solid var(--borda); border-radius:10px; padding:16px 20px; margin-bottom:24px; font-size:12px; font-weight:700; color:var(--cinza); }
+    .zip-file { display:flex; align-items:center; gap:10px; }
+    .zip-file span { color:var(--cinza-claro); }
+    .btn-zip { font-family:var(--fonte); font-size:13px; font-weight:900; letter-spacing:2px; text-transform:uppercase; background:var(--laranja); color:#fff; border:none; padding:14px 32px; border-radius:9px; cursor:pointer; box-shadow:0 0 20px var(--laranja-glow); transition:all .2s; display:inline-flex; align-items:center; gap:9px; }
+    .btn-zip:hover { box-shadow:0 0 36px var(--laranja-glow); transform:translateY(-1px); }
+    .btn-zip:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn-zip.done { background:linear-gradient(135deg,var(--verde),#00c460); color:#000; box-shadow:0 0 20px rgba(0,224,106,.25); }
+    .progresso-zip { height:4px; background:var(--borda); border-radius:99px; overflow:hidden; margin:16px 0 0; display:none; }
+    .progresso-zip-fill { height:100%; background:var(--laranja); border-radius:99px; transition:width .2s; }
+
+    /* AÇÕES FINAIS */
+    .acoes { display:flex; gap:12px; flex-wrap:wrap; }
+    .btn { font-family:var(--fonte); font-size:12px; font-weight:900; letter-spacing:2px; text-transform:uppercase; padding:12px 24px; border-radius:8px; border:none; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:7px; text-decoration:none; }
+    .btn-ghost { background:var(--fundo-card); border:1px solid var(--borda); color:var(--cinza); }
+    .btn-ghost:hover { border-color:var(--borda-hover); color:var(--branco); background:var(--fundo-alt); }
+    .btn-final { background:linear-gradient(135deg,var(--verde),#00c460); color:#000; font-weight:900; box-shadow:0 0 14px rgba(0,224,106,.2); }
+    .btn-final:hover { box-shadow:0 0 28px rgba(0,224,106,.4); transform:translateY(-1px); }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:28px; right:28px; background:var(--fundo-card); border:1px solid var(--borda-hover); border-radius:10px; padding:13px 18px; font-size:12px; font-weight:700; color:var(--branco); display:flex; align-items:center; gap:9px; box-shadow:0 14px 40px rgba(0,0,0,.5); z-index:300; transform:translateY(70px); opacity:0; transition:all .28s cubic-bezier(.4,0,.2,1); pointer-events:none; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    .toast.green { border-color:var(--verde); }
+    .toast.orange { border-color:var(--laranja); }
+
+    @media (max-width:600px) { .page { padding:28px 16px 60px; } header { padding:0 18px; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="hlogo" href="#">
+    <div class="hlogo-mark">M</div>
+    <div class="hlogo-text">
+      <span class="sup">Mente Olímpica</span>
+      <span class="main">OMMO <em>2025</em></span>
+    </div>
+  </a>
+  <span class="badge">PROVA ENVIADA</span>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-icon">✅</span>
+    <h1 class="hero-title">Prova <em>enviada!</em></h1>
+    <p class="hero-sub">Suas respostas foram registradas. Faça o download do arquivo ZIP com toda a sua prova para garantir sua participação.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats" id="stats-grid"></div>
+
+  <!-- RESPOSTAS -->
+  <p class="sec-title">Suas Respostas</p>
+  <div class="resp-list" id="resp-list"></div>
+
+  <!-- ZIP -->
+  <p class="sec-title">Download da Prova</p>
+  <div class="zip-box">
+    <span class="zip-icon">📦</span>
+    <p class="zip-title">BAIXAR PROVA EM ZIP</p>
+    <p class="zip-sub">O arquivo ZIP contém todas as suas respostas e imagens enviadas, organizados para entrega.</p>
+    <div class="zip-contents" id="zip-contents">
+      <div class="zip-file">📄 <span>respostas.json</span> — Todas as respostas em formato estruturado</div>
+      <div class="zip-file">📋 <span>relatorio.html</span> — Relatório visual da prova</div>
+    </div>
+    <button class="btn-zip" id="btn-zip" onclick="gerarZip()">
+      ⬇ GERAR E BAIXAR ZIP
+    </button>
+    <div class="progresso-zip" id="pzip">
+      <div class="progresso-zip-fill" id="pzip-fill"></div>
+    </div>
+  </div>
+
+  <!-- AÇÕES FINAIS -->
+  <div class="acoes">
+    <a href="final.html" class="btn btn-final">CONCLUIR →</a>
+    <a href="prova.html" class="btn btn-ghost">← VOLTAR À PROVA</a>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ═══ LER DADOS DO LOCALSTORAGE ═══ */
+const ANSWERS       = JSON.parse(localStorage.getItem('ommo_answers') || '{}');
+const META          = JSON.parse(localStorage.getItem('ommo_meta') || '{}');
+const QUESTOES_INFO = JSON.parse(localStorage.getItem('ommo_questoes_info') || '[]');
+const TEMPO_USADO   = parseInt(localStorage.getItem('ommo_tempo_usado') || '0');
+const START_TS      = parseInt(localStorage.getItem('ommo_start') || Date.now());
+
+// Carrega imagens do localStorage
+const IMAGES = {};
+QUESTOES_INFO.forEach((q, i) => {
+  const img = localStorage.getItem(`ommo_img_${i}`);
+  if (img) IMAGES[i] = JSON.parse(img);
+});
+
+/* ═══ FORMATAR TEMPO ═══ */
+function fmtTempo(s) {
+  const h = String(Math.floor(s/3600)).padStart(2,'0');
+  const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+  const sc = String(s%60).padStart(2,'0');
+  return `${h}:${m}:${sc}`;
+}
+
+/* ═══ STATS ═══ */
+function renderStats() {
+  const total    = QUESTOES_INFO.length;
+  const feitas   = Object.keys(ANSWERS).filter(k => ANSWERS[k] != null).length;
+  const temImgs  = Object.keys(IMAGES).length;
+  const pontosMax = QUESTOES_INFO.reduce((a, q) => a + (q.pontos || 0), 0);
+
+  const grid = document.getElementById('stats-grid');
+  grid.innerHTML = `
+    <div class="stat"><div class="stat-n">${feitas}/${total}</div><div class="stat-d">Respondidas</div></div>
+    <div class="stat"><div class="stat-n">${fmtTempo(TEMPO_USADO)}</div><div class="stat-d">Tempo Usado</div></div>
+    <div class="stat"><div class="stat-n">${temImgs}</div><div class="stat-d">Imagens</div></div>
+    <div class="stat"><div class="stat-n">${pontosMax}</div><div class="stat-d">Pts Possíveis</div></div>
+  `;
+}
+
+/* ═══ LISTA DE RESPOSTAS ═══ */
+function renderRespostas() {
+  const list = document.getElementById('resp-list');
+  list.innerHTML = '';
+
+  QUESTOES_INFO.forEach((q, i) => {
+    const resp = ANSWERS[i];
+    const img  = IMAGES[i];
+    const tem  = resp != null;
+
+    let valorHTML = '';
+    if (!tem) {
+      valorHTML = `<div class="resp-valor vazia">Em branco</div>`;
+    } else if (resp === '__imagem__') {
+      valorHTML = `<div class="resp-valor ok">📎 Imagem</div>`;
+    } else {
+      valorHTML = `<div class="resp-valor ok">Alt. ${resp}</div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'resp-card';
+    card.innerHTML = `
+      <div class="resp-card-head">
+        <div class="resp-status ${tem?'ok':'vazia'}"></div>
+        <span class="resp-qnum">Q${String(q.id).padStart(2,'0')}</span>
+        <div class="resp-info">
+          <div class="resp-area">${q.area} · ${q.dificuldade}</div>
+          <span class="resp-tipo-badge ${q.tipo}">${q.tipo}</span>
+        </div>
+        <div>
+          ${valorHTML}
+          <div class="resp-pts">${q.pontos} pts</div>
+        </div>
+      </div>
+      ${img ? `
+      <div class="resp-img-preview">
+        <img src="${img.base64}" alt="${img.nome}">
+        <p class="resp-img-nome">📎 ${img.nome} · ${img.w}×${img.h}px</p>
+      </div>` : ''}
+    `;
+    list.appendChild(card);
+  });
+}
+
+/* ═══ ATUALIZAR CONTEÚDO ZIP NA UI ═══ */
+function atualizarZipContents() {
+  const cont = document.getElementById('zip-contents');
+  let html = `
+    <div class="zip-file">📄 <span>respostas.json</span> — Todas as respostas</div>
+    <div class="zip-file">📋 <span>relatorio.html</span> — Relatório visual</div>
+  `;
+  Object.keys(IMAGES).forEach(i => {
+    const img = IMAGES[i];
+    html += `<div class="zip-file">🖼 <span>imagens/q${String(parseInt(i)+1).padStart(2,'0')}_${img.nome}</span></div>`;
+  });
+  cont.innerHTML = html;
+}
+
+/* ═══ GERAR ZIP ═══ */
+async function gerarZip() {
+  const btn  = document.getElementById('btn-zip');
+  const pzip = document.getElementById('pzip');
+  const fill = document.getElementById('pzip-fill');
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ GERANDO ZIP...';
+  pzip.style.display = 'block';
+
+  const setP = (pct) => { fill.style.width = pct + '%'; };
+  setP(5);
+
+  await new Promise(r => setTimeout(r, 50));
+
+  const zip = new JSZip();
+  const imgFolder = zip.folder('imagens');
+
+  setP(15);
+
+  // 1. respostas.json
+  const dataEnvio = new Date().toISOString();
+  const respostasJSON = {
+    prova: META.titulo || 'OMMO 2025',
+    edicao: META.edicao || '1ª Edição',
+    dataEnvio,
+    tempoUsado: fmtTempo(TEMPO_USADO),
+    totalQuestoes: QUESTOES_INFO.length,
+    totalRespondidas: Object.keys(ANSWERS).filter(k => ANSWERS[k] != null).length,
+    questoes: QUESTOES_INFO.map((q, i) => {
+      const resp = ANSWERS[i];
+      return {
+        id: q.id,
+        area: q.area,
+        tipo: q.tipo,
+        dificuldade: q.dificuldade,
+        pontos: q.pontos,
+        resposta: resp === '__imagem__'
+          ? { tipo: 'imagem', arquivo: IMAGES[i]?.nome || null }
+          : (resp || null)
+      };
+    })
+  };
+
+  zip.file('respostas.json', JSON.stringify(respostasJSON, null, 2));
+  setP(30);
+
+  // 2. Imagens
+  const imgKeys = Object.keys(IMAGES);
+  for (let idx = 0; idx < imgKeys.length; idx++) {
+    const i   = imgKeys[idx];
+    const img = IMAGES[i];
+    const ext = img.nome.split('.').pop() || 'jpg';
+    const nome = `q${String(parseInt(i)+1).padStart(2,'0')}_${img.nome}`;
+    const b64data = img.base64.split(',')[1];
+    imgFolder.file(nome, b64data, { base64: true });
+    setP(30 + Math.round(40 * (idx + 1) / imgKeys.length));
+    await new Promise(r => setTimeout(r, 10));
+  }
+
+  setP(75);
+
+  // 3. relatorio.html
+  const relatorio = gerarRelatorioHTML(respostasJSON);
+  zip.file('relatorio.html', relatorio);
+  setP(88);
+
+  // 4. Gerar ZIP
+  const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } }, (meta) => {
+    setP(88 + Math.round(10 * meta.percent / 100));
+  });
+
+  setP(100);
+
+  // Download
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  const filename = `OMMO_2025_${ts}.zip`;
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.className = 'btn-zip done';
+    btn.innerHTML = '✅ ZIP BAIXADO';
+    toast('📦 ZIP gerado com sucesso!', 'green');
+  }, 500);
+}
+
+/* ═══ GERAR RELATÓRIO HTML ═══ */
+function gerarRelatorioHTML(dados) {
+  const linhas = dados.questoes.map(q => {
+    let respStr = '—';
+    if (q.resposta) {
+      if (typeof q.resposta === 'object') respStr = `📎 Imagem: ${q.resposta.arquivo}`;
+      else respStr = `Alternativa ${q.resposta}`;
+    }
+    const cor = q.resposta ? '#00E06A' : '#6A6A6A';
+    return `<tr>
+      <td style="color:#FE6000;font-weight:900;padding:10px 16px;">Q${String(q.id).padStart(2,'0')}</td>
+      <td style="padding:10px 16px;">${q.area}</td>
+      <td style="padding:10px 16px;">${q.tipo}</td>
+      <td style="padding:10px 16px;">${q.dificuldade}</td>
+      <td style="padding:10px 16px;">${q.pontos} pts</td>
+      <td style="color:${cor};font-weight:700;padding:10px 16px;">${respStr}</td>
+    </tr>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Relatório OMMO 2025</title>
+  <style>
+    body { font-family: 'Courier New', monospace; background: #080808; color: #fff; padding: 40px; }
+    h1 { color: #FE6000; font-size: 28px; margin-bottom: 4px; }
+    .sub { color: #6A6A6A; font-size: 13px; margin-bottom: 32px; }
+    .meta { display: flex; gap: 20px; margin-bottom: 32px; flex-wrap: wrap; }
+    .meta-item { background: #0F0F0F; border: 1px solid #1C1C1C; padding: 14px 20px; border-radius: 8px; }
+    .meta-v { font-size: 22px; font-weight: 900; color: #FE6000; }
+    .meta-d { font-size: 10px; color: #6A6A6A; text-transform: uppercase; letter-spacing: 2px; }
+    table { width: 100%; border-collapse: collapse; background: #0F0F0F; border-radius: 12px; overflow: hidden; }
+    th { background: #141414; padding: 10px 16px; text-align: left; font-size: 10px; letter-spacing: 3px; color: #6A6A6A; text-transform: uppercase; }
+    tr:nth-child(even) { background: #0a0a0a; }
+    .footer { margin-top: 32px; font-size: 11px; color: #444; }
+  </style>
+</head>
+<body>
+  <h1>🏆 OMMO 2025</h1>
+  <p class="sub">Relatório de Respostas — Gerado em ${new Date().toLocaleString('pt-BR')}</p>
+  <div class="meta">
+    <div class="meta-item"><div class="meta-v">${dados.totalRespondidas}/${dados.totalQuestoes}</div><div class="meta-d">Respondidas</div></div>
+    <div class="meta-item"><div class="meta-v">${dados.tempoUsado}</div><div class="meta-d">Tempo Usado</div></div>
+    <div class="meta-item"><div class="meta-v">${dados.dataEnvio.slice(0,10)}</div><div class="meta-d">Data de Envio</div></div>
+  </div>
+  <table>
+    <thead><tr>
+      <th>Q</th><th>Área</th><th>Tipo</th><th>Dificuldade</th><th>Pontos</th><th>Resposta</th>
+    </tr></thead>
+    <tbody>${linhas}</tbody>
+  </table>
+  <p class="footer">Mente Olímpica — OMMO 2025 · Arquivo gerado automaticamente</p>
+</body>
+</html>`;
+}
+
+/* ═══ TOAST ═══ */
+let toastT;
+function toast(msg, tipo = '') {
+  const el = document.getElementById('toast');
+  el.innerHTML = msg;
+  el.className = `toast ${tipo} show`;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ═══ INIT ═══ */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!QUESTOES_INFO.length) {
+    document.querySelector('.hero-title').innerHTML = 'Nenhuma prova encontrada';
+    document.querySelector('.hero-sub').textContent = 'Acesse esta página após concluir a prova.';
+    return;
+  }
+  renderStats();
+  renderRespostas();
+  atualizarZipContents();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMMO 2025 — Concluído</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --laranja: #FE6000; --laranja-glow: rgba(254,96,0,.3); --laranja-dim: rgba(254,96,0,.1);
+      --roxo: #670BF5;
+      --verde: #00E06A; --verde-dim: rgba(0,224,106,.08);
+      --branco: #FFFFFF; --cinza-claro: #C8C8C8; --cinza: #6A6A6A;
+      --fundo: #080808; --fundo-card: #0F0F0F; --fundo-alt: #141414;
+      --borda: #1C1C1C; --borda-hover: #2E2E2E;
+      --fonte: 'Azeret Mono', monospace;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--fonte); background: var(--fundo); color: var(--branco); min-height: 100vh; overflow-x: hidden; }
+    body::after { content:''; position:fixed; inset:0; background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); opacity:.022; pointer-events:none; z-index:9999; }
+
+    /* ── BACKGROUND RADIAL ── */
+    .bg-radial { position:fixed; inset:0; background:
+      radial-gradient(ellipse 60% 50% at 50% -10%, rgba(103,11,245,.12), transparent),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(254,96,0,.07), transparent);
+      pointer-events:none; z-index:0; }
+
+    /* ── HEADER ── */
+    header { position:relative; z-index:10; background:rgba(8,8,8,.94); backdrop-filter:blur(18px); border-bottom:1px solid var(--borda); display:flex; align-items:center; justify-content:space-between; padding:0 36px; height:62px; }
+    .hlogo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .hlogo-mark { width:34px; height:34px; background:var(--laranja); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; color:#fff; box-shadow:0 0 14px var(--laranja-glow); }
+    .hlogo-text { display:flex; flex-direction:column; line-height:1.1; }
+    .hlogo-text .sup { font-size:9px; font-weight:700; letter-spacing:4px; color:var(--cinza); text-transform:uppercase; }
+    .hlogo-text .main { font-size:14px; font-weight:900; letter-spacing:1px; }
+    .hlogo-text .main em { color:var(--laranja); font-style:normal; }
+
+    /* ── CONTENT ── */
+    .content { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 62px); padding:60px 24px; text-align:center; }
+
+    /* ── TROPHY ANIMATION ── */
+    .trophy-wrap { position:relative; margin-bottom:32px; }
+    .trophy { font-size:80px; display:block; animation:bounce 2.4s ease-in-out infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25%       { transform: translateY(-8px) rotate(-3deg); }
+      75%       { transform: translateY(-8px) rotate(3deg); }
+    }
+    .trophy-ring {
+      position:absolute; inset:-20px; border-radius:50%;
+      border:2px solid rgba(254,96,0,.15);
+      animation:ring 2.4s ease-in-out infinite;
+    }
+    .trophy-ring:nth-child(2) { inset:-36px; border-color:rgba(254,96,0,.08); animation-delay:.3s; }
+    @keyframes ring { 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.08);opacity:1} }
+
+    /* ── TEXTO ── */
+    .main-tag { font-size:10px; font-weight:900; letter-spacing:5px; color:var(--laranja); text-transform:uppercase; margin-bottom:18px; }
+    .main-title { font-size:clamp(28px,5vw,52px); font-weight:900; line-height:1.05; margin-bottom:14px; }
+    .main-title .line1 { display:block; color:var(--branco); }
+    .main-title .line2 { display:block; color:var(--verde); }
+    .main-sub { font-size:15px; font-weight:700; color:var(--cinza); max-width:480px; line-height:1.75; margin-bottom:48px; }
+    .main-sub strong { color:var(--cinza-claro); }
+
+    /* ── STEPS ── */
+    .steps { display:flex; flex-direction:column; gap:0; max-width:400px; width:100%; margin:0 auto 48px; text-align:left; }
+    .step { display:flex; gap:16px; padding:0 0 28px; position:relative; }
+    .step:last-child { padding-bottom:0; }
+    .step-line { position:absolute; left:14px; top:28px; bottom:0; width:1px; background:var(--borda); }
+    .step:last-child .step-line { display:none; }
+    .step-n { width:28px; height:28px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; position:relative; z-index:1; }
+    .step-n.done { background:rgba(0,224,106,.15); border:1px solid var(--verde); color:var(--verde); }
+    .step-n.pending { background:var(--fundo-card); border:1px solid var(--borda-hover); color:var(--cinza); }
+    .step-body { padding-top:4px; }
+    .step-title { font-size:13px; font-weight:900; margin-bottom:3px; }
+    .step-title.done { color:var(--verde); }
+    .step-title.pending { color:var(--cinza-claro); }
+    .step-desc { font-size:12px; font-weight:700; color:var(--cinza); line-height:1.6; }
+
+    /* ── CTA ── */
+    .cta-group { display:flex; flex-direction:column; align-items:center; gap:12px; }
+    .btn-site { font-family:var(--fonte); font-size:13px; font-weight:900; letter-spacing:2px; text-transform:uppercase; background:var(--laranja); color:#fff; border:none; padding:14px 36px; border-radius:9px; cursor:pointer; box-shadow:0 0 22px var(--laranja-glow); transition:all .2s; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+    .btn-site:hover { box-shadow:0 0 40px var(--laranja-glow); transform:translateY(-2px); }
+    .btn-sec { font-family:var(--fonte); font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; background:none; border:1px solid var(--borda); color:var(--cinza); padding:10px 22px; border-radius:8px; cursor:pointer; transition:all .2s; text-decoration:none; }
+    .btn-sec:hover { border-color:var(--borda-hover); color:var(--cinza-claro); background:var(--fundo-card); }
+
+    /* ── DIVIDER ── */
+    .divider { width:60px; height:1px; background:var(--borda); margin:0 auto 40px; }
+
+    /* ── CONFETTI ── */
+    .confetti-wrap { position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:5; }
+    .confetti-piece { position:absolute; top:-10px; width:8px; height:8px; border-radius:2px; animation:fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity:0; } }
+
+    /* ── FOOTER ── */
+    .page-footer { position:relative; z-index:1; text-align:center; padding:24px; border-top:1px solid var(--borda); }
+    .page-footer p { font-size:10px; font-weight:700; letter-spacing:2px; color:var(--cinza); text-transform:uppercase; }
+
+    @media (max-width:600px) { header { padding:0 18px; } .trophy { font-size:60px; } }
+  </style>
+</head>
+<body>
+
+<div class="bg-radial"></div>
+<div class="confetti-wrap" id="confetti"></div>
+
+<header>
+  <a class="hlogo" href="https://www.menteolimpica.com.br" target="_blank">
+    <div class="hlogo-mark">M</div>
+    <div class="hlogo-text">
+      <span class="sup">Mente Olímpica</span>
+      <span class="main">OMMO <em>2025</em></span>
+    </div>
+  </a>
+</header>
+
+<div class="content">
+
+  <div class="trophy-wrap">
+    <div class="trophy-ring"></div>
+    <div class="trophy-ring"></div>
+    <span class="trophy">🏆</span>
+  </div>
+
+  <p class="main-tag">✦ Participação Confirmada</p>
+
+  <h1 class="main-title">
+    <span class="line1">PARABÉNS,</span>
+    <span class="line2">OLÍMPICO!</span>
+  </h1>
+
+  <p class="main-sub">
+    Você concluiu a <strong>OMMO 2025</strong>. Sua participação foi registrada e o arquivo ZIP com todas as suas respostas está disponível para download.
+  </p>
+
+  <div class="divider"></div>
+
+  <!-- PRÓXIMOS PASSOS -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-n done">✓</div>
+      <div class="step-line"></div>
+      <div class="step-body">
+        <p class="step-title done">PROVA CONCLUÍDA</p>
+        <p class="step-desc">Você respondeu todas as questões disponíveis.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n done">✓</div>
+      <div class="step-line"></div>
+      <div class="step-body">
+        <p class="step-title done">ARQUIVO GERADO</p>
+        <p class="step-desc">O ZIP com suas respostas e imagens foi criado.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n pending">3</div>
+      <div class="step-line"></div>
+      <div class="step-body">
+        <p class="step-title pending">ENVIE O ARQUIVO</p>
+        <p class="step-desc">Envie o ZIP baixado para o canal indicado no Discord ou e-mail da OMMO.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-n pending">4</div>
+      <div class="step-body">
+        <p class="step-title pending">AGUARDE OS RESULTADOS</p>
+        <p class="step-desc">A correção e divulgação dos resultados será feita pelo Mente Olímpica.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-group">
+    <a href="https://www.menteolimpica.com.br" target="_blank" class="btn-site">VOLTAR AO MENTE OLÍMPICA →</a>
+    <a href="resultado.html" class="btn-sec">← VOLTAR E BAIXAR ZIP</a>
+  </div>
+
+</div>
+
+<footer class="page-footer">
+  <p>Mente Olímpica · OMMO 2025 · Olimpíada de Matemática</p>
+</footer>
+
+<script>
+/* ═══ CONFETTI ═══ */
+function lancarConfetti() {
+  const wrap = document.getElementById('confetti');
+  const cores = ['#FE6000','#670BF5','#00E06A','#FFFFFF','#FF9500','#0053FF'];
+  const total = 60;
+
+  for (let i = 0; i < total; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+
+    const cor   = cores[Math.floor(Math.random() * cores.length)];
+    const left  = Math.random() * 100;
+    const delay = Math.random() * 3;
+    const dur   = 2.5 + Math.random() * 2;
+    const size  = 6 + Math.random() * 8;
+    const shape = Math.random() > 0.5 ? '50%' : '2px';
+
+    el.style.cssText = `
+      left: ${left}%;
+      background: ${cor};
+      width: ${size}px;
+      height: ${size}px;
+      border-radius: ${shape};
+      animation-duration: ${dur}s;
+      animation-delay: ${delay}s;
+    `;
+
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), (delay + dur + 0.5) * 1000);
+  }
+}
+
+/* ═══ VERIFICAR SE VEM DA PROVA ═══ */
+document.addEventListener('DOMContentLoaded', () => {
+  const temDados = localStorage.getItem('ommo_answers');
+  if (!temDados) {
+    document.querySelector('.main-sub').textContent = 
+      'Conclua a prova e baixe o arquivo ZIP antes de acessar esta página.';
+  }
+
+  // Lança confetti após um curto delay
+  setTimeout(lancarConfetti, 400);
+  setTimeout(lancarConfetti, 1800);
+
+  // Limpar localStorage ao sair (opcional — comentado para segurança)
+  // window.addEventListener('beforeunload', () => {
+  //   localStorage.clear();
+  // });
+});
+</script>
+</body>
+</html>
